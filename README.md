@@ -1,2 +1,90 @@
-# traccar-stealth
-Stop cheap GPS trackers from phoning home. A private, self-hosted Traccar stack wrapped in a secure, split-tunnel 1NCE OpenVPN container and exposed cleanly via Cloudflare Tunnels with zero open inbound ports. Complete privacy, automated self-healing orchestration, and native iOS/Android push notifications.
+# SinoTrack ST-901 4G Privacy-Focused Self-Hosted Traccar Stack
+
+This project provides a complete, self-contained Docker Compose architecture to reclaim ownership of your GPS tracking data.
+
+### The Privacy Problem with Cheap Trackers
+
+When you purchase a budget commercial GPS tracker like the SinoTrack ST-901 4G, it arrives pre-configured by default to transmit your real-time coordinates, vehicle status, and speed straight to a proprietary cloud server hosted in China.
+
+> **WARNING**: There is no way around this initial transmission. To configure the device, you must insert the active SIM card and power it on. The moment it connects to the cellular network, it will immediately begin sending its location to the factory server until you successfully override the configuration. If keeping your home or garage location completely hidden from that third-party server is a strict privacy concern, you should perform the initial power-on and configuration sequence in a public location.
+
+This stack closes that loophole completely by intercepting the tracker's data using a private IoT SIM card, trapping the telemetry inside an encrypted VPN tunnel, and hosting your own private analytical dashboard.
+
+## Architecture Overview
+
+To achieve total isolation with zero public port forwarding, this setup orchestrates three distinct services sharing a unified network footprint:
+	1.	OpenVPN Client Sidecar: Establishes a secure connection to the 1NCE cellular core network. It is configured to run as a split-tunnel. It routes incoming tracker traffic exclusively through the VPN interface, but allows the container space to access the public internet for cloud dependencies.
+	2.	Traccar Server: The open-source heart of the project. It uses the network stack of the OpenVPN container to securely bind to the 1NCE network and listen natively for the tracking protocol. It records coordinate history to an efficient, embedded H2 database.
+	3.	Cloudflare Tunnel (cloudflared): Creates a secure, outbound-only tunnel to Cloudflare's edge proxy. This allows you to securely access your Traccar web interface and use the official Traccar Manager mobile app from anywhere in the world using a custom domain, without ever opening inbound ports on your home firewall.
+
+## Phase 1: Prerequisites and Portal Configurations
+
+Before spinning up the Docker containers, you need to configure your external accounts and gather the required credentials.
+	1.	Cloudflare Tunnel Setup (Get Your Token)
+<!-- end list -->
+•	Log in to your Cloudflare Dashboard and navigate to Zero Trust.
+•	In the left sidebar, go to Networks and select Tunnels.
+•	Click Create a Tunnel, select Cloudflare Tunnel (named connector), and give it a name (e.g., traccar-home).
+•	Save the tunnel. On the next screen, look at the Choose environment section.
+•	Under the Docker command example, look for the long string of alphanumeric characters immediately following the --token flag. Copy this token string. You will need to paste it into your docker-compose environment variables.
+<!-- end list -->
+	1.	1NCE Portal Setup (Configure OpenVPN)
+<!-- end list -->
+•	Log in to your 1NCE Management Console.
+•	Navigate to the Configuration or Network Settings tab to locate the OpenVPN integration section.
+•	Enable the OpenVPN feature for your account. This puts your SIM cards and your server onto the same isolated, private IP network.
+•	Download your unique OpenVPN configuration files profile bundle (usually containing a vpn.conf file or keys).
+•	Create a directory on your Docker host machine named ./ovpn/ and place these files inside it. Ensure you have your credentials saved to ./ovpn/credentials.txt if your profile requires user/pass authentication.
+
+## Phase 2: Server Deployment (Docker Compose)
+
+Create your local project directories, build your configuration files, and input your specific tokens.
+	1.	Ensure you have a directory named ./ovpn/ containing your 1NCE configuration files.
+	2.	Ensure you create a basic directory named ./traccar/ containing a default traccar.xml configuration file mapping an embedded H2 database engine.
+	3.	Create your docker-compose.yml file. In the cloudflared service block, add your Cloudflare Tunnel Token to the environment or command section.
+	4.	Spin up the infrastructure using the following terminal command:
+docker compose up -d
+ 
+## Phase 3: Determining Your Server's Private IP
+
+To tell your physical tracker where to send its data, you must find the private IP address that 1NCE assigned to your OpenVPN container.
+	1.	Run the following command to inspect the startup logs of your OpenVPN container:
+docker compose logs openvpn
+	2.	Look through the output for lines matching the initialization sequence. You are looking for a line that resembles:
+net_addr_ptp_v4_add: 10.70.129.201 peer 10.70.129.202 dev tun0
+
+Alternatively, look for the incoming PUSH_REPLY line showing an ifconfig block:
+
+ifconfig 10.70.129.201 10.70.129.202
+
+  3.	Note down the first IP address listed (in this example, 10.70.129.201). This is your Traccar server's private endpoint within the isolated cellular network.
+
+## Phase 4: Tracker Configuration (Via 1NCE Dashboard)
+
+With your private server IP handily identified, you can now redirect the tracker away from its factory routing.
+
+Because 1NCE IoT SIM cards do not support receiving standard text messages sent from personal mobile devices, you must transmit these commands exclusively through the SMS tab located inside the 1NCE Management Console.
+
+Assuming the default factory PIN code of 0000, send these sequential messages via the 1NCE dashboard interface:
+	1.	Set the private APN network for your provider:
+8030000 iot.1nce.net
+	2.	Redirect the tracking server to your private OpenVPN server IP address on the port required by your specific device protocol (e.g., port 5013 for the SinoTrack h02 protocol): 8040000 5013
+	3.	Force the device to communicate strictly via cellular data rather than text responses:
+7100000
+	4.	Secure your device by changing the default communication PIN: 777 0000
+You can verify that the settings took place by sending the text command RCONF from the 1NCE dashboard to read the active profile variables back.
+
+## Finishing Up
+
+Once the tracker processes your commands, navigate back to your Cloudflare Zero Trust panel. Edit your tunnel configuration to point a custom public subdomain (traccar.yourdomain.com) to the internal hostname and port openvpn:8082. Open that URL in your browser, log into your secure dashboard, input the 10-digit Device ID found on your physical tracker, and begin mapping your trips privately.
+
+## Optional: Enabling Native Push Notifications
+
+You can configure your private server to send native push notifications directly to the official Traccar Manager app on your iPhone or Android device.
+	1.	Go to the official traccar.org website and register for a free account.
+	2.	Go to your Account page on the website and copy your personal API Key.
+	3.	Add the following lines to your local ./traccar/traccar.xml file: web,traccar YOUR_API_KEY_HERE
+
+	4.	Restart your Traccar container:
+docker compose restart traccar
+	5.	Log into your private server using the Traccar Manager mobile app, then configure your desired alerts in the Settings menu, making sure to select the "Traccar" channel.

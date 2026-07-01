@@ -19,6 +19,9 @@ services:
     network_mode: "service:openvpn" # Binds Traccar to OpenVPN's network stack
     depends_on:
       - openvpn
+    environment:
+      - CONFIG_USE_ENVIRONMENT_VARIABLES=true
+      - NOTIFICATOR_TRACCAR_KEY=${TRACCAR_API_KEY}
     volumes:
       - ./traccar/logs:/opt/traccar/logs:rw
       - ./traccar/traccar.xml:/opt/traccar/conf/traccar.xml:ro

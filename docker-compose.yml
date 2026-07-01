@@ -1,0 +1,49 @@
+services:
+  openvpn:
+    image: ghcr.io/gfk/dperson-openvpn-client-longpass-alpine:latest
+    cap_add: [NET_ADMIN]
+    devices: ["/dev/net/tun"]
+    environment:
+      - TZ=America/Toronto
+      - DEFAULT_GATEWAY=false
+    ports:
+      - "8082:8082" # Exposes Traccar Web UI to your local host network, remove if you only want access through Cloudflare
+    volumes:
+      - ./ovpn/us-east-1-client.conf:/vpn/vpn.conf:ro
+      - ./ovpn/credentials-us-east.txt:/vpn/credentials.txt:ro
+    restart: unless-stopped
+
+  traccar:
+    image: traccar/traccar:latest
+    restart: unless-stopped
+    network_mode: "service:openvpn" # Binds Traccar to OpenVPN's network stack
+    depends_on:
+      - openvpn
+    volumes:
+      - ./traccar/logs:/opt/traccar/logs:rw
+      - ./traccar/traccar.xml:/opt/traccar/conf/traccar.xml:ro
+      - ./traccar/data:/opt/traccar/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "cat /sys/class/net/tun0/operstate || exit 1"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    labels:
+      - "autoheal=true"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - openvpn
+
+  autoheal:
+    image: willfarrell/autoheal:latest
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro

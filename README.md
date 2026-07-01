@@ -13,29 +13,30 @@ This stack closes that loophole completely by configuring the tracker to send it
 ## Architecture Overview
 
 To achieve total isolation with zero public port forwarding, this setup orchestrates three distinct services sharing a unified network footprint:
-1.	**OpenVPN Client Sidecar**: Establishes a secure connection to the 1NCE cellular core network. It is configured to run as a split-tunnel. It routes incoming tracker traffic exclusively through the VPN interface, but allows the container space to access the public internet for cloud dependencies.
-2.	**Traccar Server**: The open-source heart of the project. It uses the network stack of the OpenVPN container to securely bind to the 1NCE network and listen natively for the tracking protocol. It records coordinate history to an efficient, embedded H2 database.
-3.	**Cloudflare Tunnel (`cloudflared`)**: Creates a secure, outbound-only tunnel to Cloudflare's edge proxy. This allows you to securely access your Traccar web interface and use the official Traccar Manager mobile app from anywhere in the world using a custom domain, without ever opening inbound ports on your home firewall.
+1.	**OpenVPN Client Sidecar**: The 1NCE cellular core network offers an [OpenVPN server free of charge](https://help.1nce.com/docs/network-services/network-services-vpn-service/) with their 10-year IoT SIM cards. We configure it to route incoming tracker traffic exclusively through the VPN interface, but allows the container space to access the public internet for cloud dependencies (split tunneling).
+2.	**Traccar Server**: The open-source heart of the project. It uses the network stack of the OpenVPN container to securely bind to the 1NCE network and listen natively for the tracking protocol. It records coordinate history to the embedded file-based H2 database, but it could be configured to use a real DB if you have many trackers.
+3.	**Cloudflare Tunnel (`cloudflared`)**: Creates a [secure, outbound-only tunnel to Cloudflare's edge proxy](https://developers.cloudflare.com/tunnel/). This allows you to securely access your Traccar web interface and use the official Traccar Manager mobile app from anywhere in the world using a custom domain, without ever opening inbound ports on your home firewall.
 
 ## Phase 1: Prerequisites and Portal Configurations
 
 Before spinning up the Docker containers, you need to configure your external accounts and gather the required credentials.
 
-### Cloudflare Tunnel Setup (Get Your Token)
+### Cloudflare Tunnel Setup (Get the cloudflared Token)
 
-1. Log in to your Cloudflare Dashboard and navigate to Zero Trust.
-2. In the left sidebar, go to Networks and select Tunnels.
-3. Click Create a Tunnel, select Cloudflare Tunnel (named connector), and give it a name (e.g., traccar-home).
+1. Log in to your [Cloudflare Dashboard](https://dash.cloudflare.com/login) and navigate to **Zero Trust**.
+2. In the left sidebar, go to **Networks** and select **Connectors**.
+3. Click **Create a Tunnel**, select **cloudflared**, and give it a name (e.g., traccar-home).
 4. Save the tunnel. On the next screen, look at the Choose environment section.
-5. Under the Docker command example, look for the long string of alphanumeric characters immediately following the --token flag. Copy this token string. You will need to paste it into your docker-compose environment variables.
+5. Select the Docker command, look for the long string of alphanumeric characters immediately following the `--token` flag. Copy this token string. You will need to paste it into your docker-compose environment variables.
 
 ### 1NCE Portal Setup (Configure OpenVPN)
 
-1. Log in to your 1NCE Management Console.
-2. Navigate to the Configuration or Network Settings tab to locate the OpenVPN integration section.
-3. Enable the OpenVPN feature for your account. This puts your SIM cards and your server onto the same isolated, private IP network.
-4. Download your unique OpenVPN configuration files profile bundle (usually containing a vpn.conf file or keys).
-5. Create a directory on your Docker host machine named `ovpn` and place these files inside it. 
+1. Log in to your [1NCE Management Console](https://portal.1nce.com/).
+2. Navigate to the **Configuration tab**, the select the **Breakout Settings**.
+3. In manual mode, select the region closest to you. This is mandatory to enable OpenVPN.
+4. After saving the change, scroll down to **OpenVPN Configuration**, then select **Linux/macOS**
+5. Download the two OpenVPN configuration files that are generated for you. If you ever change the breakout region, you'll have to download these again.
+6. Create a directory on your Docker host machine named `ovpn` and place these files inside it. 
 
 ## Phase 2: Server Deployment (Docker Compose)
 

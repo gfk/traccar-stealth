@@ -4,7 +4,7 @@ This project provides a complete, self-contained Docker Compose architecture to 
 
 ### The Privacy Problem with Cheap Trackers
 
-When you purchase a budget GPS tracker on eBay like the SinoTrack ST-901, it arrives pre-configured by default to transmit your real-time coordinates, vehicle status, and speed straight to a proprietary cloud server hosted in China.
+When you purchase a budget GPS tracker on eBay like the SinoTrack ST-901, it very often arrives pre-configured by default to transmit your real-time coordinates, vehicle status, and speed straight to a proprietary cloud server hosted in China (for *convenience*).
 
 > **WARNING**: There is no way around this initial transmission. To configure the device, you must insert the active SIM card and power it on. The moment it connects to the cellular network, it will immediately begin sending its location to the factory server until you successfully override the configuration. If keeping your home or garage location completely hidden from that third-party server is a privacy concern, you should perform the initial power-on and configuration sequence in a public location.
 

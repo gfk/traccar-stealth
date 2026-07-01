@@ -68,7 +68,7 @@ ifconfig 10.70.129.201 10.70.129.202
 
 With your private server IP handily identified, you can now redirect the tracker away from its factory routing.
 
-> **WARNING**: There is no way around an initial transmission to the third-party server. To configure the device, you must insert the active SIM card and power it on. The moment it connects to the cellular network, it will immediately begin sending its location to the factory server until you successfully override the configuration. If keeping your home or garage location completely hidden from that third-party server is a privacy concern, you should perform the initial power-on and configuration sequence in a public location.
+> **WARNING**: There is no way around an initial transmission to the third-party server. To configure the device, you must insert the active SIM card and power it on. The moment it connects to the cellular network, it will immediately begin sending its location to the factory server until you successfully override the configuration. If keeping your home or garage location completely hidden from that third-party server is a privacy concern, you should perform the initial power-on and configuration sequence in an anonymous location.
 
 Because 1NCE IoT SIM cards do not support receiving standard text messages sent from personal mobile devices, you must transmit these commands exclusively through the SMS tab located inside the 1NCE Management Console.
 

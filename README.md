@@ -1,4 +1,4 @@
-# SinoTrack ST-901 4G Privacy-Focused Self-Hosted Traccar Stack
+# SinoTrack ST-901 Privacy-Focused Self-Hosted Traccar Docker Stack
 
 This project provides a complete, self-contained Docker Compose architecture to reclaim ownership of your GPS tracking data.
 

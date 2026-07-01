@@ -11,15 +11,15 @@ This stack closes that loophole completely by configuring the tracker to send it
 ## Architecture Overview
 
 To achieve total isolation with zero public port forwarding, this setup orchestrates three distinct services sharing a unified network footprint:
-1.	**OpenVPN Client Sidecar**: The 1NCE cellular core network offers an [OpenVPN server free of charge](https://help.1nce.com/docs/network-services/network-services-vpn-service/) with their 10-year IoT SIM cards. We configure it to route incoming tracker traffic exclusively through the VPN interface, but allows the container space to access the public internet for cloud dependencies (split tunneling).
-2.	**Traccar Server**: The open-source heart of the project. It uses the network stack of the OpenVPN container to securely bind to the 1NCE network and listen natively for the tracking protocol. It records coordinate history to the embedded file-based H2 database, but it could be configured to use a real DB if you have many trackers.
+1.	**OpenVPN Client Sidecar**: The 1NCE cellular core network offers an [OpenVPN server free of charge](https://help.1nce.com/docs/network-services/network-services-vpn-service/) with their [10-year IoT SIM cards](https://www.1nce.com/en-us/1nce-connect/features/sim-cards). We configure it to route incoming tracker traffic through the VPN interface.
+2.	[**Traccar Server**](https://www.traccar.org/): The open-source heart of the project. It uses the network stack of the OpenVPN container to securely bind to the 1NCE network and listen natively for the tracking protocol. It records coordinate history to the embedded file-based H2 database, but it could be configured to use a real DB if you have many trackers. We configure the OpenVPN setup for split tunelling, so that traccar is be able to call the traccar notification API to send push notifications on iOS and Android.
 3.	**Cloudflare Tunnel (`cloudflared`)**: Creates a [secure, outbound-only tunnel to Cloudflare's edge proxy](https://developers.cloudflare.com/tunnel/). This allows you to securely access your Traccar web interface and use the official Traccar Manager mobile app from anywhere in the world using a custom domain, without ever opening inbound ports on your home firewall.
 
 ## Phase 1: Prerequisites and Portal Configurations
 
 ### Prerequisites
 - [GPS tracker supported by Traccar](https://www.traccar.org/devices/) (I used a SinoTrack ST-901 4G).
-- 1NCE IoT SIM Card
+- [1NCE IoT SIM Card](https://www.1nce.com/en-us/1nce-connect/features/sim-cards)
 - Cloudflare account with a domain configured on their nameservers.
 - Host machine running Docker and Docker Compose.
 

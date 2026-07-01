@@ -17,6 +17,12 @@ To achieve total isolation with zero public port forwarding, this setup orchestr
 
 ## Phase 1: Prerequisites and Portal Configurations
 
+### Prerequisites
+- [GPS tracker supported by Traccar](https://www.traccar.org/devices/) (I used a SinoTrack ST-901 4G).
+- 1NCE IoT SIM Card
+- Cloudflare account with a domain configured on their nameservers.
+- Host machine running Docker and Docker Compose.
+
 Before spinning up the Docker containers, you need to configure your external accounts and gather the required credentials.
 
 ### Cloudflare Tunnel Setup (Get the cloudflared Token)

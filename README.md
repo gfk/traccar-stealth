@@ -53,17 +53,12 @@ Before spinning up the Docker containers, you need to configure your external ac
 ## Phase 3: Determining Your Server's Private IP
 
 To tell your physical tracker where to send its data, you must find the private IP address that 1NCE assigned to your OpenVPN container.
-1.	Run the following command to inspect the startup logs of your OpenVPN container:
-docker compose logs openvpn
+1.	Run the following command to inspect the startup logs of your OpenVPN container: `docker compose logs openvpn`
 2.	Look through the output for lines matching the initialization sequence. You are looking for a line that resembles:
-`
-net_addr_ptp_v4_add: 10.70.129.201 peer 10.70.129.202 dev tun0
-`
+`net_addr_ptp_v4_add: 10.70.129.201 peer 10.70.129.202 dev tun0`
 
 Alternatively, look for the incoming PUSH_REPLY line showing an ifconfig block:
-`
-ifconfig 10.70.129.201 10.70.129.202
-`
+`ifconfig 10.70.129.201 10.70.129.202`
 
   3.	Note down the first IP address listed (in this example, `10.70.129.201`). This is your Traccar server's private endpoint within the isolated cellular network.
 

@@ -42,7 +42,6 @@ Before spinning up the Docker containers, you need to configure your external ac
 3. In manual mode, select the region closest to you. This is mandatory to enable OpenVPN.
 4. After saving the change, scroll down to **OpenVPN Configuration**, then select **Linux/macOS**
 5. Download the two OpenVPN configuration files that are generated for you. If you ever change the breakout region, you'll have to download these again.
-6. Create a directory on your Docker host machine named `ovpn` and place these files inside it. 
 
 ## Phase 2: Server Deployment (Docker Compose)
 

@@ -1,2 +1,6 @@
 .env
-
+traccar/data/database.mv.db
+traccar/data/database.trace.db
+traccar/logs/tracker-server.log*
+ovpn/*.conf
+ovpn/credentials*

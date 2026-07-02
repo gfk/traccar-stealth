@@ -6,7 +6,7 @@ This project provides a complete, self-contained Docker Compose architecture to 
 
 When you purchase a budget GPS tracker on eBay like the SinoTrack ST-901, it very often arrives pre-configured by default to transmit your real-time coordinates, vehicle status, and speed straight to a proprietary cloud server hosted in China (for *convenience*).
 
-This stack closes that loophole completely by configuring the tracker to send its telemetry inside an encrypted VPN tunnel, and hosting your own private traccar server.
+This stack closes that loophole completely by configuring the tracker to send its telemetry inside an encrypted VPN tunnel to your private traccar server.
 
 ## Architecture Overview
 

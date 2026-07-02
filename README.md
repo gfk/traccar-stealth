@@ -77,10 +77,10 @@ With your private server IP on hand, you can now redirect the tracker away from 
 Because 1NCE IoT SIM cards do not support receiving standard text messages sent from personal mobile devices, you must transmit these commands exclusively through the SMS tab located inside the 1NCE Management Console.
 
 Assuming the default factory PIN code of 0000, send these sequential messages via the 1NCE dashboard interface:
-1.	Set the private APN network for your provider:
+1.	Set the tracking server to your private OpenVPN server IP address on the port required by your specific device protocol (e.g., port 5013 for the SinoTrack h02 protocol): `8040000 10.70.129.201 5013`
+2.	Set the private APN network for your provider:
 `8030000 iot.1nce.net`
-2.	Redirect the tracking server to your private OpenVPN server IP address on the port required by your specific device protocol (e.g., port 5013 for the SinoTrack h02 protocol): `8040000 5013`
-3. Send the `RCONF` SMS command, where you can verify that the settings took place. Also note the ID of the tracker, we'll use it when configuring traccar.
+3. Send the `RCONF` SMS command, where you can verify that the settings took place. Also note the ID of the tracker, which is the second parameter, we'll use it when configuring traccar.
 
 ## Finishing Up
 

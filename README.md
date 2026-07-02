@@ -42,6 +42,9 @@ Before spinning up the Docker containers, you need to configure your external ac
 3. In manual mode, select the region closest to you. This is mandatory to enable OpenVPN.
 4. After saving the change, scroll down to **OpenVPN Configuration**, then select **Linux/macOS**
 5. Download the two OpenVPN configuration files that are generated for you. If you ever change the breakout region, you'll have to download these again.
+6. Open the `.conf` file you just downloaded from 1NCE and comment out the `auto-nocache` line by adding a hash symbol in front of it (so it reads: `# auth-nocache`)
+
+> The `auth-nocache` directive tells OpenVPN to immediately erase your login credentials from memory after the initial connection. While this is a standard security practice for desktop clients, it completely breaks background Docker containers. Exactly every 60 minutes, the 1NCE server enforces a mandatory security renegotiation of the tunnel keys. Because the password was erased, OpenVPN tries to pause and prompt an interactive terminal for the password again. Since the Docker container runs in the background with no keyboard attached, the process hangs indefinitely and your tracking data stops flowing. To fix this and allow the tunnel to silently re-key itself every hour, you must edit the `.conf` file provided by 1NCE and comment out that directive.
 
 ## Phase 2: Server Deployment (Docker Compose)
 

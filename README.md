@@ -17,13 +17,14 @@ To achieve total isolation with zero public port forwarding, this setup orchestr
 4.	**Network Namespace Resilience with Autoheal**: If the 1NCE OpenVPN connection ever completely drops and the OpenVPN container is forced to restart, it destroys the shared Docker network namespace. Because the Traccar container relies entirely on that specific namespace to function, a VPN restart leaves Traccar running but completely isolated from the network. It will hang in a zombie state, unable to receive GPS coordinates or send push notifications until it is manually restarted.
 This is why this setup includes the [Autoheal container](https://github.com/willfarrell/docker-autoheal). Autoheal acts as a local watchdog, continuously monitoring the Docker health checks of our defined services. If the VPN drops and Traccar loses its internal network bindings, its built-in health check will fail and flag the container as unhealthy. Autoheal instantly detects this state and automatically restarts the Traccar container, forcing it to gracefully re-attach to the newly restored OpenVPN network namespace without any manual intervention.
 
-## Phase 1: Prerequisites and Portal Configurations
+## Prerequisites
 
-### Prerequisites
 - [GPS tracker supported by Traccar](https://www.traccar.org/devices/) (I used a SinoTrack ST-901 4G).
 - [1NCE IoT SIM Card](https://www.1nce.com/en-us/1nce-connect/features/sim-cards)
 - Cloudflare account with a domain configured on their nameservers.
 - Host machine running Docker and Docker Compose.
+
+## Phase 1: Portal Configurations
 
 Before spinning up the Docker containers, you need to configure your external accounts and gather the required credentials.
 
@@ -69,7 +70,7 @@ Alternatively, look for the incoming PUSH_REPLY line showing an ifconfig block:
 
 ## Phase 4: Tracker Configuration (Via 1NCE Dashboard)
 
-With your private server IP handily identified, you can now redirect the tracker away from its factory routing.
+With your private server IP on hand, you can now redirect the tracker away from its factory routing.
 
 > **WARNING**: There is no way around an initial transmission to the third-party server. To configure the device, you must insert the active SIM card and power it on. The moment it connects to the cellular network, it will immediately begin sending its location to the factory server until you successfully override the configuration. If keeping your home or garage location completely hidden from that third-party server is a privacy concern, you should perform the initial power-on and configuration sequence in an anonymous location.
 

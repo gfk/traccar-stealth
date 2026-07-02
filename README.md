@@ -46,14 +46,10 @@ Before spinning up the Docker containers, you need to configure your external ac
 
 ## Phase 2: Server Deployment (Docker Compose)
 
-Create your local project directories, build your configuration files, and input your specific tokens.
-1.	Ensure you have a directory named `./ovpn/` containing your 1NCE configuration files.
-2.	Ensure you create a basic directory named `./traccar/` containing a default traccar.xml configuration file mapping an embedded H2 database engine.
-3.	Create your `docker-compose.yml` file. In the cloudflared service block, add your Cloudflare Tunnel Token to the environment or command section.
-4.	Spin up the infrastructure using the following terminal command:
-`
-docker compose up -d
-`
+1.	Clone this repo: `git clone https://github.com/gfk/traccar-stealth.git`
+2.	Create a `.env` file and set the `CLOUDFLARE_TUNNEL_TOKEN` value to your Cloudflare Tunnel Token.
+3.	Save your two OpenVPN configuration files in the `ovpn` directory and specify their filenames in the `volumes` configuration for openvpn.
+4.	Spin up the infrastructure: `docker compose up -d`
  
 ## Phase 3: Determining Your Server's Private IP
 

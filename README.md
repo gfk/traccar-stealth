@@ -6,7 +6,7 @@ This project provides a complete, self-contained Docker Compose architecture to 
 
 When you purchase a budget GPS tracker on eBay like the SinoTrack ST-901, it very often arrives pre-configured by default to transmit your real-time coordinates, vehicle status, and speed straight to a proprietary cloud server hosted in China (for *convenience*).
 
-This stack closes that loophole completely by configuring the tracker to send its telemetry inside an encrypted VPN tunnel, and hosting your own private traccar server.
+This stack closes that loophole completely by configuring the tracker to send its telemetry inside an encrypted VPN tunnel to your private traccar server.
 
 ## Architecture Overview
 
@@ -35,25 +35,20 @@ Before spinning up the Docker containers, you need to configure your external ac
 
 ### 1NCE Portal Setup (Configure OpenVPN)
 
-> IMPORTANT: The VPN network is setup **per order**, so if you do like I did and order 1 SIM card to test things out, then order a couple more later, they're not going to be on the same VPN network. It's much easier to order all of your SIM cards at the same time.
+> IMPORTANT: The VPN network is setup by 1NCE **per order**, so if you do like I did and order 1 SIM card to test things out, then order a couple more later, they're not going to be on the same VPN network. It's much easier to order all of your SIM cards at the same time.
 
 1. Log in to your [1NCE Management Console](https://portal.1nce.com/).
 2. Navigate to the **Configuration tab**, the select the **Breakout Settings**.
 3. In manual mode, select the region closest to you. This is mandatory to enable OpenVPN.
 4. After saving the change, scroll down to **OpenVPN Configuration**, then select **Linux/macOS**
 5. Download the two OpenVPN configuration files that are generated for you. If you ever change the breakout region, you'll have to download these again.
-6. Create a directory on your Docker host machine named `ovpn` and place these files inside it. 
 
 ## Phase 2: Server Deployment (Docker Compose)
 
-Create your local project directories, build your configuration files, and input your specific tokens.
-1.	Ensure you have a directory named `./ovpn/` containing your 1NCE configuration files.
-2.	Ensure you create a basic directory named `./traccar/` containing a default traccar.xml configuration file mapping an embedded H2 database engine.
-3.	Create your `docker-compose.yml` file. In the cloudflared service block, add your Cloudflare Tunnel Token to the environment or command section.
-4.	Spin up the infrastructure using the following terminal command:
-`
-docker compose up -d
-`
+1.	Clone this repo: `git clone https://github.com/gfk/traccar-stealth.git`
+2.	Create a `.env` file and set the `CLOUDFLARE_TUNNEL_TOKEN` value to your Cloudflare Tunnel Token.
+3.	Save your two OpenVPN configuration files in the `ovpn` directory and specify their filenames in the `volumes` configuration for openvpn.
+4.	Spin up the infrastructure: `docker compose up -d`
  
 ## Phase 3: Determining Your Server's Private IP
 

@@ -35,7 +35,7 @@ Before spinning up the Docker containers, you need to configure your external ac
 
 ### 1NCE Portal Setup (Configure OpenVPN)
 
-> IMPORTANT: The VPN network is setup **per order**, so if you do like I did and order 1 SIM card to test things out, then order a couple more later, they're not going to be on the same VPN network. It's much easier to order all of your SIM cards at the same time.
+> IMPORTANT: The VPN network is setup by 1NCE **per order**, so if you do like I did and order 1 SIM card to test things out, then order a couple more later, they're not going to be on the same VPN network. It's much easier to order all of your SIM cards at the same time.
 
 1. Log in to your [1NCE Management Console](https://portal.1nce.com/).
 2. Navigate to the **Configuration tab**, the select the **Breakout Settings**.

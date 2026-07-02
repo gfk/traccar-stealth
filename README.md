@@ -70,13 +70,15 @@ Alternatively, look for the incoming PUSH_REPLY line showing an ifconfig block:
 
 ## Phase 4: Tracker Configuration (Via 1NCE Dashboard)
 
+These instruction are for the SinoTrack ST-901, if you use another tracker, the SMS commands will likely be different.
+
 With your private server IP on hand, you can now redirect the tracker away from its factory routing.
 
-> **WARNING**: There is no way around an initial transmission to the third-party server. To configure the device, you must insert the active SIM card and power it on. The moment it connects to the cellular network, it will immediately begin sending its location to the factory server until you successfully override the configuration. If keeping your home or garage location completely hidden from that third-party server is a privacy concern, you should perform the initial power-on and configuration sequence in an anonymous location.
+> **Privacy Air-Gap** When you first power on the tracker with the 1NCE SIM card inserted, it will try to send your location to the factory Chinese server. However, because it does not yet have the correct 1NCE APN configured, it cannot connect to the internet. It is effectively air-gapped. By sending the server redirect command before the APN command, we can rewrite the destination IP while the device is offline, ensuring your home location is never leaked to the factory server. However, if keeping your home or garage location completely hidden from that third-party server is a privacy concern, performing the initial power-on and configuration sequence in an anonymous location would be added security in case a mistake is made during the initial config.
 
 Because 1NCE IoT SIM cards do not support receiving standard text messages sent from personal mobile devices, you must transmit these commands exclusively through the SMS tab located inside the 1NCE Management Console.
 
-Assuming the default factory PIN code of 0000, send these sequential messages via the 1NCE dashboard interface:
+Assuming the default factory PIN code of `0000`, send these sequential messages via the 1NCE dashboard interface:
 1.	Set the tracking server to your private OpenVPN server IP address on the port required by your specific device protocol (e.g., port 5013 for the SinoTrack h02 protocol): `8040000 10.70.129.201 5013`
 2.	Set the private APN network for your provider:
 `8030000 iot.1nce.net`
